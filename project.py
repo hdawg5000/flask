@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 app = Flask(__name__)
 
 from sqlalchemy import create_engine
@@ -25,6 +25,7 @@ def newMenuItem(restaurant_id):
         newItem = MenuItem(name = request.form['name'], restaurant_id = restaurant_id)
         session.add(newItem)
         session.commit()
+        flash("New menu item created!")
         return redirect(url_for('restaurantMenu', restaurant_id=restaurant_id))
     else:
         return render_template('newmenuitem.html', restaurant_id=restaurant_id)
@@ -37,6 +38,7 @@ def editMenuItem(restaurant_id, menu_id):
             item.name = request.form['name']
             session.add(item)
             session.commit()
+            flash("Menu item edited!")
             return redirect(url_for('restaurantMenu', restaurant_id=restaurant_id))
     else:
         return render_template('editmenuitem.html', restaurant_id=restaurant_id, menu_id=menu_id, item=item)
@@ -47,11 +49,13 @@ def deleteMenuItem(restaurant_id, menu_id):
     if request.method == 'POST':
         session.delete(item)
         session.commit()
+        flash("Menu item deleted!")
         return redirect(url_for('restaurantMenu', restaurant_id=restaurant_id))
     else:
         return render_template('deletemenuitem.html', restaurant_id=restaurant_id, menu_id=menu_id, item=item)
 
 #if running from python interpreter, run following code
 if __name__ == '__main__':
+    app.secret_key = 'super_secret_key'
     app.debug = True #Helpful as server is restarted automatically each time code changes
     app.run(host = '0.0.0.0', port = 5000)
